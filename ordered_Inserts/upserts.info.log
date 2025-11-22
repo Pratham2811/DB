@@ -1,0 +1,263 @@
+✅ WHAT ARE UPSERTS (Deep Practical Meaning)
+Upsert = UPDATE + INSERT combined.
+
+MongoDB tries to update a document based on your filter.
+If NO document matches → MongoDB creates (inserts) a new document automatically.
+
+So:
+
+If match exists → update it.
+If match doesn’t exist → insert new doc.
+
+
+This replaces the old pattern:
+
+❌ find →
+❌ if exists → update
+❌ else → insert
+
+MongoDB does both in one atomic write operation.
+
+🧠 INTERNAL MENTAL MODEL (How MongoDB handles it)
+
+When you do:
+
+updateOne(
+  { email: "abc@gmail.com" },
+  { $set: { name: "Prathamesh" } },
+  { upsert: true }
+)
+
+
+MongoDB does this internally:
+
+Search in index for email: abc@gmail.com
+
+If found → update that document
+
+If NOT found →
+
+Create a new document
+
+Merge your filter + update
+
+Assign _id automatically
+
+Commit the write atomically
+
+This also means:
+
+Your filter becomes part of the inserted document if no doc is found.
+🔥 PRACTICAL EXAMPLE (You MUST understand this)
+Code:
+db.users.updateOne(
+  { email: "abc@gmail.com" },
+  { $set: { name: "Prathamesh" } },
+  { upsert: true }
+);
+
+CASE 1: Document exists
+{ email: "abc@gmail.com", name: "Old Name" }
+
+
+It becomes:
+
+{ email: "abc@gmail.com", name: "Prathamesh" }
+
+CASE 2: Document does NOT exist
+
+Inserted document will be:
+
+{
+  _id: ObjectId(...),
+  email: "abc@gmail.com",   // from the filter
+  name: "Prathamesh"        // from $set
+}
+
+🚀 DEEP PRACTICAL — INSERT BEHAVIOR
+❗Important thing new developers MISS
+
+When upsert happens:
+
+🔹 MongoDB inserts filter fields
+🔹 AND updates apply
+🔹 BUT update operators behave differently during insert
+
+For example:
+
+$setOnInsert
+
+
+runs only during insert, not during update.
+
+This is VERY powerful in real systems.
+
+🧪 PRACTICAL EXERCISE (DO THIS)
+
+Run the following code in Node.js:
+
+const { MongoClient } = require("mongodb");
+
+async function test() {
+  const client = new MongoClient("mongodb://localhost:27017");
+  await client.connect();
+
+  const col = client.db("practice").collection("upsertTest");
+  await col.deleteMany({});
+
+  // 1. Upsert when no doc exists
+  let r1 = await col.updateOne(
+    { username: "prathamesh" },
+    { $set: { score: 10 } },
+    { upsert: true }
+  );
+
+  console.log("Upsert 1:", r1);
+
+  // 2. Upsert when doc EXISTS
+  let r2 = await col.updateOne(
+    { username: "prathamesh" },
+    { $inc: { score: 5 } },
+    { upsert: true }
+  );
+
+  console.log("Upsert 2:", r2);
+
+  console.log("Final Docs:", await col.find().toArray());
+  client.close();
+}
+
+test();
+
+Expected Output:
+
+First call → inserted
+
+Second call → updated
+
+Final doc:
+
+{ username: "prathamesh", score: 15 }
+
+
+This is EXACT backend behavior.
+
+🔥 SUPER PRACTICAL REAL WORLD USE CASES
+1. User login from Google OAuth
+
+If user logs in first time → create user
+Else → update their lastLogin timestamp
+
+updateOne(
+  { googleId },
+  { $set: { lastLogin: new Date() }, $setOnInsert: { createdAt: new Date() } },
+  { upsert: true }
+)
+
+2. File system metadata sync
+
+When your app indexes files, some may be new, some existing.
+
+Upserts avoid duplicate checks.
+
+3. Caching system
+
+If API result missing in DB → insert
+If exists → update TTL
+
+4. Analytics counters
+updateOne(
+  { userId },
+  { $inc: { views: 1 } },
+  { upsert: true }
+)
+
+⚠️ DEEP TRAP EVERY FRESHER MISSES
+
+If your filter is incorrect, you will accidentally insert a WRONG document.
+
+Example:
+
+updateOne({ email: undefined }, ...)
+
+
+→ inserts { email: null }
+→ security bug
+→ duplicates
+→ data corruption
+
+This is why backend engineers validate filters strictly.
+
+🔍 🔥 UPSERT RETURN RESULT (VERY IMPORTANT)
+
+MongoDB returns:
+
+upsertedId → when insert happened
+
+matchedCount → if matched
+
+modifiedCount → if update happened
+
+Example:
+
+Insert case:
+matchedCount: 0
+modifiedCount: 0
+upsertedId: ObjectId(...)
+
+Update case:
+matchedCount: 1
+modifiedCount: 1
+upsertedId: undefined
+
+
+Backend devs use this to detect what happened.
+
+//upserts with updateMany behavior
+🚨 FIRST: THE CORE TRUTH (Most Developers Don’t Know This)
+👉 updateMany with upsert: true NEVER inserts multiple documents.
+👉 It inserts ONLY ONE document. ALWAYS. EVER.
+
+Even if your filter matches zero documents, MongoDB will create just one single document, not many.
+
+This is the biggest misconception.
+
+🔥 DEEP INTERNAL WORKING — EXACT PIPELINE
+When you run:
+db.collection.updateMany(
+  { age: 20 },
+  { $set: { status: "active" } },
+  { upsert: true }
+);
+
+
+MongoDB does:
+
+Scan index for all docs where age = 20
+
+If matches found → update all of them
+
+If NO matches found →
+insert ONE document that looks like:
+
+{
+  age: 20,              // filter fields
+  status: "active"      // update fields
+}
+
+
+That’s it.
+NOT 10 inserts.
+NOT 3.
+ONLY 1.
+
+🧠 WHY ONLY ONE INSERT?
+
+BECAUSE:
+
+upsert means “if NOTHING matches, create ONE document representing this condition.”
+
+It does not mean “create many possible variations”.
+
+MongoDB cannot guess how many documents you wanted to insert.
+So it inserts just one.
