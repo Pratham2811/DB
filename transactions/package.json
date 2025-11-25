@@ -1,0 +1,16 @@
+{
+  "name": "mongodb-transactions-demo",
+  "version": "1.0.0",
+  "description": "Demo of MongoDB Transactions (ES6)",
+  "main": "transaction_workshop.js",
+  "type": "module",
+  "scripts": {
+    "start": "node transaction_workshop.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.21.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
