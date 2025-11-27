@@ -1,0 +1,6 @@
+_id,username,email,password,rootDirId
+ObjectId(69269827e5b62c502da0b0ca),sakshi,sakshifulari28@example.com,1235,ObjectId(69269827e5b62c502da0b0cb)
+ObjectId(6928217fefe2c60a945c4c79),sakshi,sakshifulari8@example.com,1235,ObjectId(6928217fefe2c60a945c4c7a)
+ObjectId(69282183efe2c60a945c4c7b),sakshi,sakshifulari@example.com,1235,ObjectId(69282183efe2c60a945c4c7c)
+ObjectId(69282188efe2c60a945c4c7d),sakshi,fulari@example.com,1235,ObjectId(69282188efe2c60a945c4c7e)
+ObjectId(69282190efe2c60a945c4c7f),sakshi,sakshi@example.com,1235,ObjectId(69282190efe2c60a945c4c80)

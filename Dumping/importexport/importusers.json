@@ -1,0 +1,5 @@
+{"_id":{"$oid":"69269827e5b62c502da0b0ca"},"username":"sakshi","email":"sakshifulari28@example.com","password":"1235","rootDirId":{"$oid":"69269827e5b62c502da0b0cb"},"storageUsed":0,"createdAt":{"$date":"2025-11-26T06:03:19.987Z"}}
+{"_id":{"$oid":"6928217fefe2c60a945c4c79"},"username":"sakshi","email":"sakshifulari8@example.com","password":"1235","rootDirId":{"$oid":"6928217fefe2c60a945c4c7a"},"storageUsed":0,"createdAt":{"$date":"2025-11-27T10:01:35.74Z"}}
+{"_id":{"$oid":"69282183efe2c60a945c4c7b"},"username":"sakshi","email":"sakshifulari@example.com","password":"1235","rootDirId":{"$oid":"69282183efe2c60a945c4c7c"},"storageUsed":0,"createdAt":{"$date":"2025-11-27T10:01:39.779Z"}}
+{"_id":{"$oid":"69282188efe2c60a945c4c7d"},"username":"sakshi","email":"fulari@example.com","password":"1235","rootDirId":{"$oid":"69282188efe2c60a945c4c7e"},"storageUsed":0,"createdAt":{"$date":"2025-11-27T10:01:44.073Z"}}
+{"_id":{"$oid":"69282190efe2c60a945c4c7f"},"username":"sakshi","email":"sakshi@example.com","password":"1235","rootDirId":{"$oid":"69282190efe2c60a945c4c80"},"storageUsed":0,"createdAt":{"$date":"2025-11-27T10:01:52.756Z"}}
